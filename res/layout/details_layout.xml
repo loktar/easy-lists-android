@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+    <TextView android:id="@+id/details_name_text_view"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:layout_alignParentTop="true"
+              android:textSize="24dip"
+              android:paddingLeft="15dip"
+            />
+
+    <EditText android:id="@+id/add_task_edit_text"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:layout_alignParentBottom="true"
+              android:hint="@string/add_task_hint"
+              android:singleLine="true"
+            />
+
+    <ListView android:id="@+id/tasks_list_view"
+              android:layout_height="fill_parent"
+              android:layout_width="fill_parent"
+              android:layout_below="@id/details_name_text_view"
+              android:layout_above="@id/add_task_edit_text"
+              />
+
+</RelativeLayout>
