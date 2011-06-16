@@ -34,6 +34,7 @@ public class DetailsActivity extends RoboActivity {
         bindEvents();
 
         tasksListView.setAdapter(taskAdapter.setItems(checklist.getTasks()));
+        tasksListView.setOnKeyListener(new UpdateTaskKeyListener());
     }
 
     private void bindEvents() {
@@ -49,12 +50,25 @@ public class DetailsActivity extends RoboActivity {
         }
     }
 
+    private void updateTaskFromView(View view) {
+        String taskName = ((EditText) view).getText().toString();
+        System.out.println(taskName);
+    }
+
     private class AddTaskKeyListener implements View.OnKeyListener {
         @Override
         public boolean onKey(View view, int i, KeyEvent keyEvent) {
             if (i == KeyEvent.KEYCODE_ENTER) {
                 addTaskFromView();
             }
+            return false;
+        }
+    }
+
+    private class UpdateTaskKeyListener implements View.OnKeyListener {
+        @Override
+        public boolean onKey(View view, int i, KeyEvent keyEvent) {
+            updateTaskFromView(view);
             return false;
         }
     }
