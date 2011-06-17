@@ -52,6 +52,24 @@ public class AsyncCacheTest {
         assertThat(callback.value, equalTo("cached value"));
     }
 
+    @Test
+    public void get_shouldOnlyMakeOneRemoteCallForSuccessiveCallsWithTheSameKey() throws Exception {
+        cache.get("key", callback);
+        assertThat(callback.value, equalTo("(stored) remote value 0"));
+
+        cache.get("key", callback);
+        assertThat(callback.value, equalTo("(stored) remote value 0"));
+    }
+
+    @Test
+    public void get_shouldRetrieveDifferentValuesForDifferentKeys() throws Exception {
+        cache.get("key0", callback);
+        assertThat(callback.value, equalTo("(stored) remote value 0"));
+
+        cache.get("key1", callback);
+        assertThat(callback.value, equalTo("(stored) remote value 1"));
+    }
+
     private class TestAsyncCache extends AsyncCache<String> {
         private Map<String, String> cache = new HashMap<String, String>();
         private int count;
@@ -78,7 +96,7 @@ public class AsyncCacheTest {
         }
 
         @Override
-        public boolean isCached(String key) {
+        public boolean hasCacheValue(String key) {
             return cache.containsKey(key);
         }
 

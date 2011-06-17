@@ -7,10 +7,10 @@ public abstract class AsyncCache<T> {
 
     public abstract void storeValue(String key, T value);
 
-    public abstract boolean isCached(String key);
+    public abstract boolean hasCacheValue(String key);
 
     public void get(String key, Callback<T> callback) {
-        if (!isCached(key)) {
+        if (!hasCacheValue(key)) {
             getRemoteValue(new StoreRemoteValueCallback(key));
         }
         T cachedValue = getCachedValue(key);
