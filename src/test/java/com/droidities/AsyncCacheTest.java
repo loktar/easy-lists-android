@@ -11,17 +11,19 @@ import static org.junit.Assert.assertThat;
 
 public class AsyncCacheTest {
     private TestCacheCallback callback;
+    private TestProvider provider;
     private TestAsyncCache cache;
 
     @Before
     public void setUp() throws Exception {
         callback = new TestCacheCallback();
+        provider = new TestProvider();
         cache = new TestAsyncCache();
     }
 
     @Test
     public void get_shouldCallTheCallbackWithTheRemoteValueIfNotCached() throws Exception {
-        cache.get("key", callback);
+        cache.get("key", callback, provider);
 
         assertThat(callback.value, equalTo("(stored) remote value 0"));
     }
@@ -30,14 +32,14 @@ public class AsyncCacheTest {
     public void get_shouldCallTheCallbackByRetrievingTheStoredValue() throws Exception {
         // This lets us cache read-once types like streams. First read goes into
         // the cache, then call callback with a new stream
-        cache.get("key", callback);
+        cache.get("key", callback, provider);
 
         assertThat(callback.value, equalTo("(stored) remote value 0"));
     }
 
     @Test
     public void get_shouldStoreTheRemoteValueIfNotCached() throws Exception {
-        cache.get("key", callback);
+        cache.get("key", callback, provider);
 
         assertThat(cache.storedKey, equalTo("key"));
         assertThat(cache.storedValue, equalTo("remote value 0"));
@@ -47,40 +49,34 @@ public class AsyncCacheTest {
     public void get_shouldCallTheCallbackWithTheStoredValueIfAlreadyCached() throws Exception {
         cache.prepopulate("key", "cached value");
 
-        cache.get("key", callback);
+        cache.get("key", callback, provider);
 
         assertThat(callback.value, equalTo("cached value"));
     }
 
     @Test
-    public void get_shouldOnlyMakeOneRemoteCallForSuccessiveCallsWithTheSameKey() throws Exception {
-        cache.get("key", callback);
+    public void get_shouldUseTheCachedValueForSuccessiveCallsWithTheSameKey() throws Exception {
+        cache.get("key", callback, provider);
         assertThat(callback.value, equalTo("(stored) remote value 0"));
 
-        cache.get("key", callback);
+        cache.get("key", callback, provider);
         assertThat(callback.value, equalTo("(stored) remote value 0"));
     }
 
     @Test
     public void get_shouldRetrieveDifferentValuesForDifferentKeys() throws Exception {
-        cache.get("key0", callback);
+        cache.get("key0", callback, provider);
         assertThat(callback.value, equalTo("(stored) remote value 0"));
 
-        cache.get("key1", callback);
+        cache.get("key1", callback, provider);
         assertThat(callback.value, equalTo("(stored) remote value 1"));
     }
 
     private class TestAsyncCache extends AsyncCache<String> {
         private Map<String, String> cache = new HashMap<String, String>();
-        private int count;
 
         private String storedKey;
         private String storedValue;
-
-        @Override
-        public void getRemoteValue(Callback callback) {
-            callback.cachedValueRetrieved("remote value " + count++);
-        }
 
         @Override
         public String getCachedValue(String key) {
@@ -111,6 +107,15 @@ public class AsyncCacheTest {
         @Override
         public void cachedValueRetrieved(String value) {
             this.value = value;
+        }
+    }
+
+    private class TestProvider implements AsyncCache.Provider<String> {
+        private int count;
+
+        @Override
+        public void getValue(AsyncCache.Callback<String> callback) {
+            callback.cachedValueRetrieved("remote value " + count++);
         }
     }
 }

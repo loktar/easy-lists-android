@@ -87,10 +87,6 @@ public class AsyncFileCacheTest {
         }
 
         @Override
-        public void getRemoteValue(Callback<InputStream> inputStreamCallback) {
-        }
-
-        @Override
         public void storeValue(String key, InputStream value) {
             super.storeValue(key, value);
             storedFiles.add(getCacheFileForKey(key));

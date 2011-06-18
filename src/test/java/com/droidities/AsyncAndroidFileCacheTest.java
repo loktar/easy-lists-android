@@ -31,9 +31,5 @@ public class AsyncAndroidFileCacheTest {
         public TestAsyncAndroidFileCache(Context context) {
             super(context);
         }
-
-        @Override
-        public void getRemoteValue(Callback<InputStream> inputStreamCallback) {
-        }
     }
 }
