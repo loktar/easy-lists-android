@@ -1,4 +1,4 @@
-package com.droidities;
+package com.droidities.cache;
 
 import android.content.Context;
 

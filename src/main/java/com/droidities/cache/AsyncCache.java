@@ -1,4 +1,4 @@
-package com.droidities;
+package com.droidities.cache;
 
 /**
  * Provides a way to retrieve values through a cache layer in an asynchronous manner using callbacks.

@@ -1,4 +1,4 @@
-package com.droidities;
+package com.droidities.cache;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.droidities;
+package com.droidities.cache;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

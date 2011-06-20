@@ -1,4 +1,6 @@
-package com.droidities;
+package com.droidities.cache;
+
+import com.droidities.Files;
 
 import java.io.*;
 
