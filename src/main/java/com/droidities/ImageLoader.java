@@ -9,11 +9,20 @@ import com.droidities.cache.AsyncCache;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ImageLoader {
-    public void loadImage(ImageView imageView, String url) {
-        AsyncCache<InputStream> cache = createCache(imageView.getContext());
-        cache.get(url, createCallback(imageView, url), createProvider(url));
+    ExecutorService pool = Executors.newFixedThreadPool(3);
+
+    public void loadImage(final ImageView imageView, final String url) {
+        pool.submit(new Runnable() {
+            @Override
+            public void run() {
+                AsyncCache<InputStream> cache = createCache(imageView.getContext());
+                cache.get(url, createCallback(imageView, url), createProvider(url));
+            }
+        });
     }
 
     protected AsyncCache<InputStream> createCache(Context context) {

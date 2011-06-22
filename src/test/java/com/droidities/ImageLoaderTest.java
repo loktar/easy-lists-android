@@ -12,8 +12,11 @@ import org.junit.runner.RunWith;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -28,20 +31,39 @@ public class ImageLoaderTest {
     @Before
     public void setUp() throws Exception {
         imageLoader = spy(new ImageLoader());
+        imageLoader.pool = new ImmediatelyExecutingService();
         doReturn(new ByteArrayInputStream("remote value".getBytes())).when(imageLoader).getInputStreamFromUrl(anyString());
+        when(imageLoader.createCache(any(Context.class))).thenReturn(new TestCache());
     }
 
     @Test
     public void loadImage_shouldSetTheImageViewsDrawable() throws Exception {
-        when(imageLoader.createCache(any(Context.class))).thenReturn(new TestCache());
         ImageView imageView = new ImageView(null);
         imageLoader.loadImage(imageView, "http://image");
         assertThat(imageView.getDrawable(), notNullValue());
     }
 
     @Test
+    public void loadImage_shouldUseAFixedThreadExecutorService() throws Exception {
+        ExecutorService pool = new ImageLoader().pool;
+        assertThat(pool, instanceOf(ThreadPoolExecutor.class));
+        assertThat(((ThreadPoolExecutor) pool).getMaximumPoolSize(), equalTo(3));
+    }
+
+    @Test
+    public void loadImage_shouldSetTheDrawableUsingTheExecutorService() throws Exception {
+        TestExecutorService testExecutorService = new TestExecutorService();
+        imageLoader.pool = testExecutorService;
+        ImageView imageView = new ImageView(null);
+        imageLoader.loadImage(imageView, "http://url");
+
+        assertThat(imageView.getDrawable(), nullValue());
+        testExecutorService.latestTask.run();
+        assertThat(imageView.getDrawable(), notNullValue());
+    }
+
+    @Test
     public void loadImage_shouldUseCachedValues() throws Exception {
-        when(imageLoader.createCache(any(Context.class))).thenReturn(new TestCache());
         TestProvider testProvider = new TestProvider();
         when(imageLoader.createProvider(anyString())).thenReturn(testProvider);
 
@@ -54,7 +76,7 @@ public class ImageLoaderTest {
 
     @Test
     public void createCache_shouldUseAndroidFileCache() throws Exception {
-        AsyncCache<InputStream> cache = imageLoader.createCache(null);
+        AsyncCache<InputStream> cache = new ImageLoader().createCache(null);
         assertThat(cache, instanceOf(AsyncAndroidFileCache.class));
     }
 
@@ -128,6 +150,84 @@ public class ImageLoaderTest {
         @Override
         public void cachedValueRetrieved(InputStream value) {
             this.value = value;
+        }
+    }
+
+    private class TestExecutorService implements ExecutorService {
+        private Runnable latestTask;
+
+        @Override
+        public void shutdown() {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public List<Runnable> shutdownNow() {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public boolean isShutdown() {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public boolean isTerminated() {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public <T> Future<T> submit(Callable<T> task) {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public <T> Future<T> submit(Runnable task, T result) {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public Future<?> submit(Runnable task) {
+            latestTask = task;
+            return null;
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            throw new RuntimeException("Should not be called");
+        }
+
+        @Override
+        public void execute(Runnable command) {
+        }
+    }
+
+    private class ImmediatelyExecutingService extends TestExecutorService {
+        @Override
+        public Future<?> submit(Runnable task) {
+            super.submit(task);
+            task.run();
+            return null;
         }
     }
 }
