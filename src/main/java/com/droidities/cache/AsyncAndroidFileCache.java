@@ -4,7 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 
-public abstract class AsyncAndroidFileCache extends AsyncFileCache {
+public class AsyncAndroidFileCache extends AsyncFileCache {
     private Context context;
 
     public AsyncAndroidFileCache(Context context) {
