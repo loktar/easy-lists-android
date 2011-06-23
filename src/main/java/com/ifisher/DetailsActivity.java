@@ -33,8 +33,8 @@ public class DetailsActivity extends RoboActivity {
 
         bindEvents();
 
+        taskAdapter.setDelegate(new TaskAdapterDelegate());
         tasksListView.setAdapter(taskAdapter.setItems(checklist.getTasks()));
-        tasksListView.setOnKeyListener(new UpdateTaskKeyListener());
     }
 
     private void bindEvents() {
@@ -50,9 +50,13 @@ public class DetailsActivity extends RoboActivity {
         }
     }
 
-    private void updateTaskFromView(View view) {
-        String taskName = ((EditText) view).getText().toString();
-        System.out.println(taskName);
+    private void updateTaskName(Task task, String taskName) {
+        if (taskName.length() > 0) {
+            task.setName(taskName);
+        } else {
+            checklist.removeTask(task);
+            taskAdapter.notifyDataSetChanged();
+        }
     }
 
     private class AddTaskKeyListener implements View.OnKeyListener {
@@ -65,11 +69,10 @@ public class DetailsActivity extends RoboActivity {
         }
     }
 
-    private class UpdateTaskKeyListener implements View.OnKeyListener {
+    private class TaskAdapterDelegate implements TaskAdapter.Delegate {
         @Override
-        public boolean onKey(View view, int i, KeyEvent keyEvent) {
-            updateTaskFromView(view);
-            return false;
+        public void updateTask(Task task, String taskName) {
+            updateTaskName(task, taskName);
         }
     }
 }

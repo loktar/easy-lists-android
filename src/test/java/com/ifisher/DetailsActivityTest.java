@@ -68,7 +68,7 @@ public class DetailsActivityTest {
         assertThat(addTaskEditText.getText().toString(), equalTo(""));
     }
 
-//    @Test
+    @Test
     public void addTask_shouldUpdateTheTaskNameWhenEditedWithEnterKey() throws Exception {
         setupActivityFor(createChecklistWithTasks("Checklist", "Task 1"));
 
@@ -79,10 +79,16 @@ public class DetailsActivityTest {
         assertThat(((Task) tasksListView.getItemAtPosition(0)).getName(), equalTo("Edited task"));
     }
 
-//    @Test
+    @Test
     public void editingTask_shouldDeleteIfNameIsBlank() throws Exception {
         Checklist checklist = new Checklist().addTask(new Task().setName("Task 1"));
         setupActivityFor(checklist.setName("Foo"));
+
+        EditText taskNameView = (EditText) tasksListView.getChildAt(0).findViewById(R.id.task_name);
+        taskNameView.setText("");
+        shadowOf(taskNameView).onKeyDown(KeyEvent.KEYCODE_ENTER, null);
+
+        assertThat(tasksListView.getChildCount(), equalTo(0));
     }
 
     private Checklist createChecklistWithTasks(String checklistName, String... taskNames) {

@@ -20,4 +20,17 @@ public class ChecklistTest {
         assertThat(tasks.get(1).getName(), equalTo("Bar"));
     }
 
+    @Test
+    public void removeTask_shouldRemoveTheTaskEvenIfItsNameHasChanged() throws Exception {
+        Checklist checklist = new Checklist();
+        Task foo = new Task().setName("Foo");
+        checklist.addTask(foo);
+        checklist.addTask(new Task().setName("Bar"));
+
+        foo.setName("More foo");
+        checklist.removeTask(foo);
+
+        assertThat(checklist.getTasks().size(), equalTo(1));
+        assertThat(checklist.getTasks().get(0).getName(), equalTo("Bar"));
+    }
 }

@@ -25,4 +25,9 @@ public class Checklist implements Serializable {
     public List<Task> getTasks() {
         return tasks;
     }
+
+    public Checklist removeTask(Task task) {
+        tasks.remove(task);
+        return this;
+    }
 }
