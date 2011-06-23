@@ -1,4 +1,4 @@
-package com.droidities;
+package com.roboboost;
 
 import android.app.Activity;
 import android.widget.Toast;

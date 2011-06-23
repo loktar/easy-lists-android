@@ -1,10 +1,10 @@
-package com.droidities;
+package com.roboboost;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
-import com.droidities.cache.AsyncAndroidFileCache;
-import com.droidities.cache.AsyncCache;
+import com.roboboost.cache.AsyncAndroidFileCache;
+import com.roboboost.cache.AsyncCache;
 
 import java.io.IOException;
 import java.io.InputStream;

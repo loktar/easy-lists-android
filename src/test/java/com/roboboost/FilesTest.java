@@ -1,4 +1,4 @@
-package com.droidities;
+package com.roboboost;
 
 import org.junit.After;
 import org.junit.Before;
