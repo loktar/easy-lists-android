@@ -56,8 +56,14 @@ public class ImageLoader {
 
         @Override
         public void cachedValueRetrieved(InputStream value) {
-            Drawable drawable = Drawable.createFromStream(value, url);
+            final Drawable drawable = Drawable.createFromStream(value, url);
+            // TODO Need to add shadow View#getHandler
+//            imageView.getHandler().post(new Runnable() {
+//                @Override
+//                public void run() {
             imageView.setImageDrawable(drawable);
+//                }
+//            });
         }
     }
 

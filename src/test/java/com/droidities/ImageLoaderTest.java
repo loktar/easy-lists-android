@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.ImageView;
 import com.droidities.cache.AsyncAndroidFileCache;
 import com.droidities.cache.AsyncCache;
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +60,18 @@ public class ImageLoaderTest {
 
         assertThat(imageView.getDrawable(), nullValue());
         testExecutorService.latestTask.run();
+        assertThat(imageView.getDrawable(), notNullValue());
+    }
+
+    @Test
+    public void loadImage_shouldSetTheImagesDrawableOnTheUiThread() throws Exception {
+        Robolectric.pauseMainLooper();
+        ImageView imageView = new ImageView(null);
+        imageLoader.loadImage(imageView, "http://url");
+
+        assertThat(imageView.getDrawable(), nullValue());
+
+        Robolectric.unPauseMainLooper();
         assertThat(imageView.getDrawable(), notNullValue());
     }
 
